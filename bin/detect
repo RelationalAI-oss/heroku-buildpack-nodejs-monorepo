@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+echo "NodeJS-Monorepo"
+exit 0

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+indent() {
+    sed -u 's/^/       /'
+}
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+
+APP_BASE=$(cat "${ENV_DIR}/APP_BASE")
+
+if [[ -z "${APP_BASE}" ]]; then
+    echo "APP_BASE was not set. Aborting" | indent
+    exit 1
+fi
+
+cp "${BUILD_DIR}/${APP_BASE}/Procfile" "${BUILD_DIR}/Procfile"
+if ! [ $? ]; then
+    echo "FAILED to copy a Procfile" | indent
+    exit 1
+fi
+echo "Copied ${APP_BASE}/Procfile as Procfile successfully" | indent
+
+cp "${BUILD_DIR}/${APP_BASE}/package.json" "${BUILD_DIR}/package.json"
+if ! [ $? ]; then
+    echo "FAILED to copy package.json" | indent
+    exit 1
+fi
+echo "Copied ${APP_BASE}/package.json as package.json successfully" | indent
+
+cp "${BUILD_DIR}/${APP_BASE}/package-lock.json" "${BUILD_DIR}/package-lock.json"
+if ! [ $? ]; then
+    echo "FAILED to copy package-lock.json" | indent
+    exit 1
+fi
+echo "Copied ${APP_BASE}/package-lock.json as package-lock.json successfully" | indent
+
+# Leaving this in from the multi-procfile buildpack in case
+# the app wants to express Heroku configuration in app.json
+APP_DIR=$(dirname "${BUILD_DIR}/${APP_BASE}/Procfile")
+
+if [[ -f "${APP_DIR}/app.json" ]]; then
+    cp "${APP_DIR}/app.json" "${BUILD_DIR}/app.json"
+    echo "Copied ${APP_DIR}/app.json as app.json successfully" | indent
+fi
